@@ -8,6 +8,7 @@ import com.hospital.backend.entity.LoginResponse;
 public interface AuthenticationService {
     LoginResponse authenticateDoctor(LoginRequest loginRequest);
     LoginResponse authenticateLabtech(LoginRequest loginRequest);
+    LoginResponse authenticatePharmacist(LoginRequest loginRequest);
     LoginResponse authenticatePatient(LoginRequest loginRequest);
     LoginResponse authenticateAdmin(LoginRequest loginRequest);
     void logout(String token);

@@ -5,10 +5,12 @@ import com.hospital.backend.entity.LoginResponse;
 import com.hospital.backend.entity.Doctor;
 import com.hospital.backend.entity.Patient;
 import com.hospital.backend.entity.Labtech;
+import com.hospital.backend.entity.Pharmacist;
 import com.hospital.backend.service.AuthenticationService;
 import com.hospital.backend.service.DoctorService;
 import com.hospital.backend.service.PatientService;
 import com.hospital.backend.service.LabtechService;
+import com.hospital.backend.service.PharmacistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     
     @Autowired
     private LabtechService labtechService;
+
+    @Autowired
+    private PharmacistService pharmacistService;
 
     @Autowired
     private PatientService patientService;
@@ -102,6 +107,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             labtech.get().getLbId(),
             labtech.get().getLbName(),
             labtech.get().getEmailId(),
+            "Login successful",
+            true
+        );
+    }
+
+    @Override
+    public LoginResponse authenticatePharmacist(LoginRequest loginRequest) {
+        // Check if email is provided
+        if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty()) {
+            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Email is required", false);
+        }
+
+        // Check if password is provided
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Password is required", false);
+        }
+
+        Optional<Pharmacist> pharmacist = pharmacistService.findByEmail(loginRequest.getEmail());
+        
+        if (!pharmacist.isPresent()) {
+            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Labtech not found with this email", false);
+        }
+        
+        if (!loginRequest.getPassword().equals(pharmacist.get().getPassword())) {
+            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Incorrect password", false);
+        }
+
+        // If we reach here, credentials are valid
+        String token = generateToken();
+        tokenUserMap.put(token, "PHARMACIST_" + pharmacist.get().getPhId());
+        
+        return new LoginResponse(
+            token,
+            "PHARMACIST",
+            pharmacist.get().getPhId(),
+            pharmacist.get().getPhName(),
+            pharmacist.get().getEmailId(),
             "Login successful",
             true
         );

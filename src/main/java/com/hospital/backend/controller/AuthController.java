@@ -23,6 +23,11 @@ public class AuthController {
         return authenticationService.authenticateLabtech(loginRequest);
     }
 
+    @PostMapping("/pharmacist/login")
+    public LoginResponse pharmacistLogin(@RequestBody LoginRequest loginRequest) {
+        return authenticationService.authenticatePharmacist(loginRequest);
+    }
+
     @PostMapping("/patient/login")
     public LoginResponse patientLogin(@RequestBody LoginRequest loginRequest) {
         return authenticationService.authenticatePatient(loginRequest);
