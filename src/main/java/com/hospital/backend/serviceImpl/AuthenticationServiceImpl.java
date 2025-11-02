@@ -4,9 +4,11 @@ import com.hospital.backend.entity.LoginRequest;
 import com.hospital.backend.entity.LoginResponse;
 import com.hospital.backend.entity.Doctor;
 import com.hospital.backend.entity.Patient;
+import com.hospital.backend.entity.Labtech;
 import com.hospital.backend.service.AuthenticationService;
 import com.hospital.backend.service.DoctorService;
 import com.hospital.backend.service.PatientService;
+import com.hospital.backend.service.LabtechService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private DoctorService doctorService;
+    
+    @Autowired
+    private LabtechService labtechService;
 
     @Autowired
     private PatientService patientService;
@@ -60,6 +65,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             doctor.get().getDrId(),
             doctor.get().getDrName(),
             doctor.get().getEmailId(),
+            "Login successful",
+            true
+        );
+    }
+
+    @Override
+    public LoginResponse authenticateLabtech(LoginRequest loginRequest) {
+        // Check if email is provided
+        if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty()) {
+            return new LoginResponse(null, "LABTECH", 0, null, null, "Email is required", false);
+        }
+
+        // Check if password is provided
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+            return new LoginResponse(null, "LABTECH", 0, null, null, "Password is required", false);
+        }
+
+        Optional<Labtech> labtech = labtechService.findByEmail(loginRequest.getEmail());
+        
+        if (!labtech.isPresent()) {
+            return new LoginResponse(null, "LABTECH", 0, null, null, "Labtech not found with this email", false);
+        }
+        
+        if (!loginRequest.getPassword().equals(labtech.get().getPassword())) {
+            return new LoginResponse(null, "LABTECH", 0, null, null, "Incorrect password", false);
+        }
+
+        // If we reach here, credentials are valid
+        String token = generateToken();
+        tokenUserMap.put(token, "LABTECH_" + labtech.get().getLbId());
+        
+        return new LoginResponse(
+            token,
+            "LABTECH",
+            labtech.get().getLbId(),
+            labtech.get().getLbName(),
+            labtech.get().getEmailId(),
             "Login successful",
             true
         );
