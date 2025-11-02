@@ -73,6 +73,17 @@ CREATE TABLE labtech (
   Experience INT,
   Password VARCHAR(255)  
 );
+
+CREATE TABLE pharmacist (
+  Ph_ID INT PRIMARY KEY AUTO_INCREMENT,
+  Ph_name VARCHAR(255),
+  Mobile_no VARCHAR(255),
+  Email_id VARCHAR(255) UNIQUE,
+  Gender VARCHAR(255),
+  Age INT,
+  Experience INT,
+  Password VARCHAR(255)  
+);
 select*from patient;
 INSERT INTO speclization (sp_id, sp_name) VALUES
 (1, 'Cardiology'),
