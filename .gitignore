@@ -91,6 +91,5 @@ application-*.properties
 # Generated files
 generated-sources/
 
-
-
+/src/main/resources/application.properties
 
