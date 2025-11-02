@@ -1,3 +1,4 @@
+
 package com.hospital.backend.repositoryImpl;
 
 import com.hospital.backend.entity.LabAppointment;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +66,9 @@ public class LabAppointmentRepositoryImpl implements LabAppointmentRepository {
 
     @Override
     public boolean existsById(int id) {
-        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM LabAppointment WHERE Appointment_ID = ?", Integer.class, id);
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM LabAppointment WHERE Appointment_ID = ?",
+                Integer.class, id);
         return count != null && count > 0;
     }
 
@@ -87,5 +91,37 @@ public class LabAppointmentRepositoryImpl implements LabAppointmentRepository {
     public List<LabAppointment> searchLabAppointmentsByPatientName(String name) {
         String sql = "SELECT la.* FROM LabAppointment la JOIN patient p ON la.P_ID=p.P_ID WHERE LOWER(p.Name) LIKE LOWER(?)";
         return jdbcTemplate.query(sql, rowMapper, "%" + name + "%");
+    }
+
+    // ✅ NEW METHODS
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByDoctorId(int doctorId) {
+        String sql = "SELECT * FROM LabAppointment WHERE DR_ID = ?";
+        return jdbcTemplate.query(sql, rowMapper, doctorId);
+    }
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByLabTechId(int labTechId) {
+        String sql = "SELECT * FROM LabAppointment WHERE Lb_ID = ?";
+        return jdbcTemplate.query(sql, rowMapper, labTechId);
+    }
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByPatientId(int patientId) {
+        String sql = "SELECT * FROM LabAppointment WHERE P_ID = ?";
+        return jdbcTemplate.query(sql, rowMapper, patientId);
+    }
+
+    @Override
+    public List<LabAppointment> getAllCompletedAppointments() {
+        String sql = "SELECT * FROM LabAppointment WHERE LOWER(status) = 'completed'";
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    @Override
+    public List<LabAppointment> getAllPastAppointments() {
+        String sql = "SELECT * FROM LabAppointment WHERE appointment_date < CURRENT_DATE";
+        return jdbcTemplate.query(sql, rowMapper);
     }
 }

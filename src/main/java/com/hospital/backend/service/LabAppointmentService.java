@@ -1,3 +1,4 @@
+
 package com.hospital.backend.service;
 
 import com.hospital.backend.entity.LabAppointment;
@@ -5,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LabAppointmentService {
+
+    // Basic CRUD operations
     LabAppointment saveLabAppointment(LabAppointment labAppointment);
     Optional<LabAppointment> getLabAppointmentById(int id);
     List<LabAppointment> getAllLabAppointments();
@@ -12,4 +15,13 @@ public interface LabAppointmentService {
     List<LabAppointment> searchLabAppointmentsByPatientName(String name);
     boolean existsById(int id);
     LabAppointment updateLabAppointment(LabAppointment labAppointment);
+
+    // Additional filters
+    List<LabAppointment> getLabAppointmentsByDoctorId(int doctorId);
+    List<LabAppointment> getLabAppointmentsByLabTechId(int labTechId);
+    List<LabAppointment> getLabAppointmentsByPatientId(int patientId);
+
+    // Status-based filters
+    List<LabAppointment> getAllCompletedAppointments();
+    List<LabAppointment> getAllPastAppointments();
 }

@@ -1,3 +1,4 @@
+
 package com.hospital.backend.serviceImpl;
 
 import com.hospital.backend.entity.LabAppointment;
@@ -52,5 +53,32 @@ public class LabAppointmentServiceImpl implements LabAppointmentService {
         if (!existsById(a.getAppointmentId()))
             throw new RuntimeException("Appointment not found: " + a.getAppointmentId());
         return repo.updateLabAppointment(a);
+    }
+
+    // ✅ New methods
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByDoctorId(int doctorId) {
+        return repo.getLabAppointmentsByDoctorId(doctorId);
+    }
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByLabTechId(int labTechId) {
+        return repo.getLabAppointmentsByLabTechId(labTechId);
+    }
+
+    @Override
+    public List<LabAppointment> getLabAppointmentsByPatientId(int patientId) {
+        return repo.getLabAppointmentsByPatientId(patientId);
+    }
+
+    @Override
+    public List<LabAppointment> getAllCompletedAppointments() {
+        return repo.getAllCompletedAppointments();
+    }
+
+    @Override
+    public List<LabAppointment> getAllPastAppointments() {
+        return repo.getAllPastAppointments();
     }
 }
