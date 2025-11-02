@@ -80,27 +80,27 @@ public class LabtestController {
     @Autowired
     private LabtestService labtestService;
 
-    // ✅ Create a new Lab Test
+   
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Labtest createLabtest(@RequestBody Labtest labtest) {
         return labtestService.saveLabtest(labtest);
     }
 
-    // ✅ Get all Lab Tests
+   
     @GetMapping
     public List<Labtest> getAllLabtests() {
         return labtestService.getAllLabtests();
     }
 
-    // ✅ Get Lab Test by ID
+    
     @GetMapping("/{id}")
     public Labtest getLabtestById(@PathVariable int id) {
         return labtestService.getLabtestById(id)
                 .orElseThrow(() -> new RuntimeException("Lab Test not found with ID: " + id));
     }
 
-    // ✅ Update Lab Test
+   
     @PutMapping("/{id}")
     public Labtest updateLabtest(@PathVariable int id, @RequestBody Labtest updatedLabtest) {
         if (!labtestService.existsById(id)) {
@@ -110,14 +110,14 @@ public class LabtestController {
         return labtestService.saveLabtest(updatedLabtest);
     }
 
-    // ✅ Delete Lab Test
+    
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLabtest(@PathVariable int id) {
         labtestService.deleteLabtest(id);
     }
 
-    // ✅ Search Lab Tests by Name (partial match)
+   
     @GetMapping("/search")
     public List<Labtest> searchLabtestsByName(@RequestParam String name) {
         return labtestService.searchLabtestsByName(name);

@@ -180,3 +180,46 @@ VALUES
 ('Dr. Nisha Paul', '9876543249', 'nisha.paul@hospital.com', 'Female', 32, 6, 'pass123', 20, 'nisha.jpg');
 
 select*from appointment;
+select *from labtech;
+
+CREATE TABLE LabTest (
+    test_id INT PRIMARY KEY AUTO_INCREMENT,
+    test_name VARCHAR(100) NOT NULL,
+    test_fee DECIMAL(10,2) NOT NULL
+);
+-- INSERT INTO LabTest (test_name, test_fee) VALUES
+-- ('Blood Test', 500.00),
+-- ('X-Ray', 800.00),
+-- ('MRI Scan', 4500.00),
+-- ('Urine Test', 300.00),
+-- ('CT Scan', 3500.00);
+
+INSERT INTO LabTest (test_name, test_fee) VALUES
+('ECG', 600.00),
+('Echocardiogram', 2500.00),
+('Lipid Profile', 700.00),
+('Liver Function Test', 750.00),
+('Kidney Function Test', 700.00),
+('Thyroid Profile', 800.00),
+('HbA1c', 650.00),
+('Vitamin D Test', 1200.00),
+('Calcium Test', 500.00),
+('Iron Studies', 900.00),
+('Blood Sugar Fasting', 300.00),
+('Blood Sugar Postprandial', 350.00),
+('Serum Electrolytes', 600.00),
+('Complete Blood Count', 400.00),
+('Urine Culture', 800.00),
+('Stool Test', 500.00),
+('CRP Test', 900.00),
+('ESR Test', 400.00),
+('Allergy Test', 1500.00),
+('HIV Test', 700.00),
+('Hepatitis B Test', 800.00),
+('Hepatitis C Test', 900.00),
+('Pregnancy Test', 300.00),
+('Bone Density Test', 2500.00),
+('Chest CT Scan', 4000.00);
+
+
+select*from labTest;
