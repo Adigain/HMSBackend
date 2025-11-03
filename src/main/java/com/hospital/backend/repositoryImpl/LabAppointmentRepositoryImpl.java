@@ -124,4 +124,9 @@ public class LabAppointmentRepositoryImpl implements LabAppointmentRepository {
         String sql = "SELECT * FROM LabAppointment WHERE appointment_date < CURRENT_DATE";
         return jdbcTemplate.query(sql, rowMapper);
     }
+    @Override
+    public List<LabAppointment> getAllUpcomingOrPendingAppointments() {
+        String sql = "SELECT * FROM LabAppointment WHERE appointment_date >= CURRENT_DATE OR LOWER(status) = 'pending'";
+        return jdbcTemplate.query(sql, rowMapper);
+    }
 }
