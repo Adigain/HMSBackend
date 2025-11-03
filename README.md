@@ -73,6 +73,34 @@ CREATE TABLE labtech (
   Experience INT,
   Password VARCHAR(255)  
 );
+
+CREATE TABLE `medicine_order` (
+  `or_id` INT NOT NULL AUTO_INCREMENT,
+  `p_id` INT NOT NULL,
+  `dr_id` INT NOT NULL,
+  `total_price` DECIMAL(10, 2) NOT NULL,
+  `status` VARCHAR(50) NOT NULL DEFAULT 'pending',
+  `order_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`or_id`),
+  KEY `fk_order_patient` (`p_id`),
+  KEY `fk_order_doctor` (`dr_id`),
+  CONSTRAINT `fk_order_patient` FOREIGN KEY (`p_id`) REFERENCES `patient` (`P_ID`),
+  CONSTRAINT `fk_order_doctor` FOREIGN KEY (`dr_id`) REFERENCES `doctor` (`DR_ID`)
+);
+
+CREATE TABLE `medicine_order_item` (
+  `item_id` INT NOT NULL AUTO_INCREMENT,
+  `or_id` INT NOT NULL,
+  `med_id` INT NOT NULL,
+  `quantity` INT NOT NULL,
+  `price_per_item` DECIMAL(10, 2) NOT NULL,
+  PRIMARY KEY (`item_id`),
+  KEY `fk_item_order` (`or_id`),
+  KEY `fk_item_medicine` (`med_id`),
+  CONSTRAINT `fk_item_order` FOREIGN KEY (`or_id`) REFERENCES `medicine_order` (`or_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_item_medicine` FOREIGN KEY (`med_id`) REFERENCES `medicine_inventory` (`med_id`)
+);
+
 select*from patient;
 INSERT INTO speclization (sp_id, sp_name) VALUES
 (1, 'Cardiology'),
