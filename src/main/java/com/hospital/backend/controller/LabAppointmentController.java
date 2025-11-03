@@ -98,4 +98,11 @@ public class LabAppointmentController {
         System.out.println("📤 Fetching all past appointments");
         return ResponseEntity.ok(service.getAllPastAppointments());
     }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<LabAppointment>> getUpcomingOrPendingAppointments() {
+        System.out.println("📤 Fetching all upcoming or pending appointments");
+        return ResponseEntity.ok(service.getAllUpcomingOrPendingAppointments());
+    }
+
 }

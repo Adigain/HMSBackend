@@ -24,4 +24,5 @@ public interface LabAppointmentRepository {
     // Status-based filters
     List<LabAppointment> getAllCompletedAppointments();
     List<LabAppointment> getAllPastAppointments();
+    List<LabAppointment> getAllUpcomingOrPendingAppointments();
 }

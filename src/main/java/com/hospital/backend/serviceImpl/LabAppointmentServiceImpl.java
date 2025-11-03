@@ -81,4 +81,8 @@ public class LabAppointmentServiceImpl implements LabAppointmentService {
     public List<LabAppointment> getAllPastAppointments() {
         return repo.getAllPastAppointments();
     }
+    @Override
+    public List<LabAppointment> getAllUpcomingOrPendingAppointments() {
+        return repo.getAllUpcomingOrPendingAppointments();
+    }
 }
