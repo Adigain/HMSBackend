@@ -73,17 +73,6 @@ CREATE TABLE labtech (
   Experience INT,
   Password VARCHAR(255)  
 );
-
-CREATE TABLE pharmacist (
-  Ph_ID INT PRIMARY KEY AUTO_INCREMENT,
-  Ph_name VARCHAR(255),
-  Mobile_no VARCHAR(255),
-  Email_id VARCHAR(255) UNIQUE,
-  Gender VARCHAR(255),
-  Age INT,
-  Experience INT,
-  Password VARCHAR(255)  
-);
 select*from patient;
 INSERT INTO speclization (sp_id, sp_name) VALUES
 (1, 'Cardiology'),
@@ -232,5 +221,51 @@ INSERT INTO LabTest (test_name, test_fee) VALUES
 ('Bone Density Test', 2500.00),
 ('Chest CT Scan', 4000.00);
 
+CREATE TABLE pharmacist (
+  Ph_ID INT PRIMARY KEY AUTO_INCREMENT,
+  Ph_name VARCHAR(255),
+  Mobile_no VARCHAR(255),
+  Email_id VARCHAR(255) UNIQUE,
+  Gender VARCHAR(255),
+  Age INT,
+  Experience INT,
+  Password VARCHAR(255)  
+);
 
 select*from labTest;
+
+
+CREATE TABLE LabAppointment (
+    Appointment_ID INT PRIMARY KEY AUTO_INCREMENT,
+    P_ID INT NOT NULL,
+    Test_ID INT NOT NULL,
+    DR_ID INT NOT NULL,
+    Lb_ID INT,
+    appointment_date DATE,
+    status VARCHAR(50) DEFAULT 'Pending',
+    remarks VARCHAR(255),
+
+    -- Foreign Keys
+    CONSTRAINT fk_labapp_patient
+        FOREIGN KEY (P_ID)
+        REFERENCES patient(P_ID)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_labapp_test
+        FOREIGN KEY (Test_ID)
+        REFERENCES LabTest(test_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_labapp_doctor
+        FOREIGN KEY (DR_ID)
+        REFERENCES doctor(DR_ID)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_labapp_labtech
+        FOREIGN KEY (Lb_ID)
+        REFERENCES labtech(Lb_ID)
+        ON DELETE SET NULL
+);
+
+select*from labtech;
+
