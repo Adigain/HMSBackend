@@ -287,13 +287,13 @@ CREATE TABLE `medicine_order_item` (
   CONSTRAINT `fk_item_medicine` FOREIGN KEY (`med_id`) REFERENCES `medicine_inventory` (`med_id`)
 );
 
-CREATE TABLE LabTest (
+CREATE TABLE labtest (
     test_id INT PRIMARY KEY AUTO_INCREMENT,
     test_name VARCHAR(100) NOT NULL,
     test_fee DECIMAL(10,2) NOT NULL
 );
 
-INSERT INTO LabTest (test_name, test_fee) VALUES
+INSERT INTO labtest (test_name, test_fee) VALUES
 ('ECG', 600.00),
 ('Echocardiogram', 2500.00),
 ('Lipid Profile', 700.00),
@@ -351,5 +351,19 @@ CREATE TABLE LabAppointment (
         REFERENCES labtech(Lb_ID)
         ON DELETE SET NULL
 );
+
+CREATE TABLE bill_order (
+  bill_id INT PRIMARY KEY AUTO_INCREMENT,
+  patient_id INT NOT NULL,
+  type VARCHAR(10) NOT NULL, -- "doc", "lab", "med"
+  item_id INT NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  payment_status VARCHAR(10) NOT NULL DEFAULT 'pending', -- "pending" or "paid"
+  billing_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (patient_id) REFERENCES patient(P_ID),
+  -- Add an index to prevent duplicates, complementing the service-layer check
+  UNIQUE KEY uk_type_item (type, item_id) 
+);
+
 
 
