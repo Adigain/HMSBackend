@@ -6,8 +6,13 @@ import com.hospital.backend.repository.LabAppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import java.sql.Statement;
 
+
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -34,18 +39,42 @@ public class LabAppointmentRepositoryImpl implements LabAppointmentRepository {
     };
 
     @Override
-    public LabAppointment saveLabAppointment(LabAppointment a) {
-        String sql = "INSERT INTO LabAppointment (P_ID, Test_ID, DR_ID, Lb_ID, appointment_date, status, remarks) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql,
-                a.getPId(),
-                a.getTestId(),
-                a.getDrId(),
-                a.getLbId(),
-                a.getAppointmentDate(),
-                a.getStatus(),
-                a.getRemarks());
-        return a;
+public LabAppointment saveLabAppointment(LabAppointment a) {
+    String sql = "INSERT INTO LabAppointment (P_ID, Test_ID, DR_ID, Lb_ID, appointment_date, status, remarks) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    
+    // To capture auto-generated primary key
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+    
+    jdbcTemplate.update(connection -> {
+        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ps.setInt(1, a.getPId());
+        ps.setInt(2, a.getTestId());
+        ps.setInt(3, a.getDrId());
+        
+        if (a.getLbId() != null)
+            ps.setInt(4, a.getLbId());
+        else
+            ps.setNull(4, java.sql.Types.INTEGER);
+        
+        if (a.getAppointmentDate() != null)
+            ps.setDate(5, new java.sql.Date(a.getAppointmentDate().getTime()));
+        else
+            ps.setNull(5, java.sql.Types.DATE);
+        
+        ps.setString(6, a.getStatus());
+        ps.setString(7, a.getRemarks());
+        return ps;
+    }, keyHolder);
+    
+    // Retrieve generated key (Appointment_ID)
+    Number key = keyHolder.getKey();
+    if (key != null) {
+        a.setAppointmentId(key.intValue());
     }
+
+    return a;
+}
+
 
     @Override
     public Optional<LabAppointment> getLabAppointmentById(int id) {
@@ -93,7 +122,7 @@ public class LabAppointmentRepositoryImpl implements LabAppointmentRepository {
         return jdbcTemplate.query(sql, rowMapper, "%" + name + "%");
     }
 
-    // ✅ NEW METHODS
+   
 
     @Override
     public List<LabAppointment> getLabAppointmentsByDoctorId(int doctorId) {
