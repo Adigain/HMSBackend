@@ -1,11 +1,15 @@
-
 package com.hospital.backend.serviceImpl;
 
 import com.hospital.backend.entity.LabAppointment;
+import com.hospital.backend.entity.Labtest;
+import com.hospital.backend.exceptions.ResourceNotFoundException;
 import com.hospital.backend.repository.LabAppointmentRepository;
+import com.hospital.backend.service.BillOrderService; 
 import com.hospital.backend.service.LabAppointmentService;
+import com.hospital.backend.service.LabtestService; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; 
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +19,12 @@ public class LabAppointmentServiceImpl implements LabAppointmentService {
 
     @Autowired
     private LabAppointmentRepository repo;
+
+    @Autowired
+    private LabtestService labtestService; 
+
+    @Autowired
+    private BillOrderService billOrderService; 
 
     @Override
     public LabAppointment saveLabAppointment(LabAppointment labAppointment) {
@@ -49,13 +59,45 @@ public class LabAppointmentServiceImpl implements LabAppointmentService {
     }
 
     @Override
-    public LabAppointment updateLabAppointment(LabAppointment a) {
-        if (!existsById(a.getAppointmentId()))
-            throw new RuntimeException("Appointment not found: " + a.getAppointmentId());
-        return repo.updateLabAppointment(a);
-    }
+    @Transactional 
+    public LabAppointment updateLabAppointment(LabAppointment updatedAppointment) {
+        int appointmentId = updatedAppointment.getAppointmentId();
+        
+        LabAppointment existingAppointment = getLabAppointmentById(appointmentId)
+            .orElseThrow(() -> new RuntimeException("Appointment not found: " + appointmentId));
 
-    // ✅ New methods
+        String oldStatus = existingAppointment.getStatus();
+        String newStatus = updatedAppointment.getStatus();
+
+        LabAppointment savedAppointment = repo.updateLabAppointment(updatedAppointment);
+
+        boolean isNowCompleted = "completed".equalsIgnoreCase(newStatus) && !"completed".equalsIgnoreCase(oldStatus);
+
+        if (isNowCompleted) {
+
+            if (!billOrderService.hasBillBeenGenerated(appointmentId, "lab")) {
+                try {
+                    int testId = savedAppointment.getTestId();
+                    Labtest labTest = labtestService.getLabtestById(testId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Labtest", "id", testId));
+                    
+                    double price = labTest.getTestFee();
+                    
+                    billOrderService.createBillOrder(
+                        savedAppointment.getPId(),     
+                        "lab",                   
+                        savedAppointment.getAppointmentId(), 
+                        price                           
+                    );
+
+                } catch (Exception e) {                    
+                    System.err.println("CRITICAL: Failed to create bill for completed lab appointment " + appointmentId + ". Error: " + e.getMessage());                    
+                }
+            }
+        }
+
+        return savedAppointment;
+    }
 
     @Override
     public List<LabAppointment> getLabAppointmentsByDoctorId(int doctorId) {

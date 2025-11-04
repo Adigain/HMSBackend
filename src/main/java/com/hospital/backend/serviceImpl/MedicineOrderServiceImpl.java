@@ -6,6 +6,7 @@ import com.hospital.backend.entity.MedicineOrderItem;
 import com.hospital.backend.exceptions.BusinessRuleException;
 import com.hospital.backend.exceptions.ResourceNotFoundException;
 import com.hospital.backend.repository.MedicineOrderRepository;
+import com.hospital.backend.service.BillOrderService; 
 import com.hospital.backend.service.MedicineInventoryService;
 import com.hospital.backend.service.MedicineOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class MedicineOrderServiceImpl implements MedicineOrderService {
 
     @Autowired
     private MedicineInventoryService medicineInventoryService;
+
+    @Autowired
+    private BillOrderService billOrderService; 
 
     @Override
     @Transactional
@@ -85,17 +89,22 @@ public class MedicineOrderServiceImpl implements MedicineOrderService {
     @Transactional
     public MedicineOrder updateOrderStatus(int id, String status) {        
         if (!"completed".equalsIgnoreCase(status)) {
-             return medicineOrderRepository.findById(id)
+            MedicineOrder currentOrder = medicineOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MedicineOrder", "id", id));
-        }
+                        
+            if (!currentOrder.getStatus().equalsIgnoreCase(status)) {
+                 return medicineOrderRepository.updateStatus(id, status);
+            }
+            return currentOrder;
+        }        
 
         MedicineOrder order = medicineOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MedicineOrder", "id", id));
-        
+                
         if ("completed".equalsIgnoreCase(order.getStatus())) {
             return order;
         }
-
+        
         for (MedicineOrderItem item : order.getItems()) {
             MedicalInventory medicine = medicineInventoryService.getMedicineById(item.getMedId())
                     .orElseThrow(() -> new ResourceNotFoundException("Medicine", "id", item.getMedId())); // Should not happen if createOrder worked
@@ -111,7 +120,20 @@ public class MedicineOrderServiceImpl implements MedicineOrderService {
             medicineInventoryService.decreaseQuantity(item.getMedId(), item.getQuantity());
         }
         
-        return medicineOrderRepository.updateStatus(id, "completed");
+        MedicineOrder updatedOrder = medicineOrderRepository.updateStatus(id, "completed");
+                
+        try {
+            billOrderService.createBillOrder(
+                updatedOrder.getpId(),    
+                "med",              
+                updatedOrder.getOrId(),   
+                updatedOrder.getTotalPrice() 
+            );
+        } catch (Exception e) {            
+            System.err.println("CRITICAL: Failed to create bill for completed medicine order " + id + ". Error: " + e.getMessage());
+        }
+
+        return updatedOrder;
     }
 
     @Override
@@ -123,4 +145,3 @@ public class MedicineOrderServiceImpl implements MedicineOrderService {
         medicineOrderRepository.deleteById(id);
     }
 }
-
