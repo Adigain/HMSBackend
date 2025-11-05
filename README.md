@@ -338,7 +338,7 @@ CREATE TABLE LabAppointment (
 
     CONSTRAINT fk_labapp_test
         FOREIGN KEY (Test_ID)
-        REFERENCES LabTest(test_id)
+        REFERENCES labtest(test_id)
         ON DELETE CASCADE,
 
     CONSTRAINT fk_labapp_doctor

@@ -23,10 +23,8 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public Doctor saveDoctor(Doctor doctor) {
         // Add null check for password
-        if (doctor.getPassword() != null && !doctor.getPassword().isEmpty()) {
-            // Skip encoding - use password as-is
-            System.out.println("Password received: " + doctor.getPassword()); // Debug log
-            // Note: password will be stored as plain text
+        if (doctor.getPassword() != null && !doctor.getPassword().isEmpty()) {          
+            doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
         } else {
             throw new IllegalArgumentException("Password cannot be empty");
         }
@@ -47,7 +45,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public Doctor updateDoctor(int id, Doctor doctor) {
         if (doctorRepository.existsById(id)) {
-            doctor.setDrId(id);
+            doctor.setDrId(id);            
             return doctorRepository.updateDoctor(doctor);
         }
         throw new RuntimeException("Doctor not found with id: " + id);

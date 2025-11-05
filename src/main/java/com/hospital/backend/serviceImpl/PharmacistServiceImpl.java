@@ -22,11 +22,9 @@ public class PharmacistServiceImpl implements PharmacistService {
 
     @Override
     public Pharmacist savePharmacist(Pharmacist pharmacist) {
-        // Add null check for password
-        if (pharmacist.getPassword() != null && !pharmacist.getPassword().isEmpty()) {
-            // Skip encoding - use password as-is
-            System.out.println("Password received: " + pharmacist.getPassword()); // Debug log
-            // Note: password will be stored as plain text
+                
+        if (pharmacist.getPassword() != null && !pharmacist.getPassword().isEmpty()) {            
+            pharmacist.setPassword(passwordEncoder.encode(pharmacist.getPassword()));
         } else {
             throw new IllegalArgumentException("Password cannot be empty");
         }
@@ -47,7 +45,7 @@ public class PharmacistServiceImpl implements PharmacistService {
     @Override
     public Pharmacist updatePharmacist(int id, Pharmacist pharmacist) {
         if (pharmacistRepository.existsById(id)) {
-            pharmacist.setPhId(id);
+            pharmacist.setPhId(id);                        
             return pharmacistRepository.updatePharmacist(pharmacist);
         }
         throw new RuntimeException("Pharmacist not found with id: " + id);

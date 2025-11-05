@@ -22,11 +22,10 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public Patient save(Patient patient) {
-        // Add null check but skip encoding
+        
         if (patient.getPassword() != null && !patient.getPassword().isEmpty()) {
-            // Skip encoding - just use password as-is
-            // patient.setPassword(passwordEncoder.encode(patient.getPassword()));
-            System.out.println("Password received: " + patient.getPassword()); // Debug log
+
+            patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         } else {
             throw new IllegalArgumentException("Password cannot be empty");
         }
@@ -97,20 +96,23 @@ public class PatientServiceImpl implements PatientService {
 		    Patient patient = patientRepository.getPatientById(id)
 		            .orElseThrow(() -> new RuntimeException("Patient not found with id: " + id));
 		    
-		    // Validate current password
-		    if (!currentPassword.equals(patient.getPassword())) {
+		    // Validate current password using bcrypt
+		    if (!passwordEncoder.matches(currentPassword, patient.getPassword())) {
 		        throw new IllegalArgumentException("Current password is incorrect");
 		    }
 		    
+		    // Encode the new password
+            String encodedNewPassword = passwordEncoder.encode(newPassword);
+
 		    // Update password
-		    int rowsUpdated = patientRepository.updatePassword(id, newPassword);
+		    int rowsUpdated = patientRepository.updatePassword(id, encodedNewPassword);
 		    
 		    if (rowsUpdated == 0) {
 		        throw new RuntimeException("Failed to update password, no rows affected");
 		    }
 		    
 		    // Return the updated patient
-		    patient.setPassword(newPassword);
+		    patient.setPassword(encodedNewPassword);
 		    return patient;
 		}
-} 
+}

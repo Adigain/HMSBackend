@@ -12,6 +12,7 @@ import com.hospital.backend.service.PatientService;
 import com.hospital.backend.service.LabtechService;
 import com.hospital.backend.service.PharmacistService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -33,6 +34,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final Map<String, String> tokenUserMap = new HashMap<>();
     private final String ADMIN_EMAIL = "admin@hospital.com";
@@ -56,7 +60,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new LoginResponse(null, "DOCTOR", 0, null, null, "Doctor not found with this email", false);
         }
         
-        if (!loginRequest.getPassword().equals(doctor.get().getPassword())) {
+        // Use passwordEncoder.matches() to compare passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), doctor.get().getPassword())) {
             return new LoginResponse(null, "DOCTOR", 0, null, null, "Incorrect password", false);
         }
 
@@ -93,7 +98,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new LoginResponse(null, "LABTECH", 0, null, null, "Labtech not found with this email", false);
         }
         
-        if (!loginRequest.getPassword().equals(labtech.get().getPassword())) {
+        // Use passwordEncoder.matches() to compare passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), labtech.get().getPassword())) {
             return new LoginResponse(null, "LABTECH", 0, null, null, "Incorrect password", false);
         }
 
@@ -127,10 +133,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Optional<Pharmacist> pharmacist = pharmacistService.findByEmail(loginRequest.getEmail());
         
         if (!pharmacist.isPresent()) {
-            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Labtech not found with this email", false);
+            return new LoginResponse(null, "PHARMACIST", 0, null, null, "Pharmacist not found with this email", false);
         }
         
-        if (!loginRequest.getPassword().equals(pharmacist.get().getPassword())) {
+        // Use passwordEncoder.matches() to compare passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), pharmacist.get().getPassword())) {
             return new LoginResponse(null, "PHARMACIST", 0, null, null, "Incorrect password", false);
         }
 
@@ -167,7 +174,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new LoginResponse(null, "PATIENT", 0, null, null, "Patient not found with this email", false);
         }
         
-        if (!loginRequest.getPassword().equals(patient.get().getPassword())) {
+        // Use passwordEncoder.matches() to compare passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), patient.get().getPassword())) {
             return new LoginResponse(null, "PATIENT", 0, null, null, "Incorrect password", false);
         }
 
@@ -202,6 +210,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new LoginResponse(null, "ADMIN", 0, null, null, "Invalid admin email", false);
         }
         
+        // Admin password is not hashed, keeping direct comparison
         if (!loginRequest.getPassword().equals(ADMIN_PASSWORD)) {
             return new LoginResponse(null, "ADMIN", 0, null, null, "Invalid admin password", false);
         }
