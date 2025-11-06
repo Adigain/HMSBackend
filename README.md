@@ -91,12 +91,3 @@ Follow these steps to get the application running locally.
 ### 4. Build and Run
 
 You can run the application using the Maven wrapper or directly from your IDE.
-
-**Using Maven Wrapper:**
-
-```bash
-# On Linux/macOS
-./mvnw spring-boot:run
-
-# On Windows
-./mvnw.cmd spring-boot:run
