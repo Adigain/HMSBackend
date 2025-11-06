@@ -23,10 +23,8 @@ public class LabtechServiceImpl implements LabtechService {
     @Override
     public Labtech saveLabtech(Labtech labtech) {
         // Add null check for password
-        if (labtech.getPassword() != null && !labtech.getPassword().isEmpty()) {
-            // Skip encoding - use password as-is
-            System.out.println("Password received: " + labtech.getPassword()); // Debug log
-            // Note: password will be stored as plain text
+        if (labtech.getPassword() != null && !labtech.getPassword().isEmpty()) {          
+            labtech.setPassword(passwordEncoder.encode(labtech.getPassword()));
         } else {
             throw new IllegalArgumentException("Password cannot be empty");
         }
@@ -47,7 +45,7 @@ public class LabtechServiceImpl implements LabtechService {
     @Override
     public Labtech updateLabtech(int id, Labtech labtech) {
         if (labtechRepository.existsById(id)) {
-            labtech.setLbId(id);
+            labtech.setLbId(id);            
             return labtechRepository.updateLabtech(labtech);
         }
         throw new RuntimeException("Labtech not found with id: " + id);
